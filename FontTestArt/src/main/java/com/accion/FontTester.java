@@ -30,28 +30,35 @@ public class FontTester {
 	
 	private Tesseract tess = null;
 	private BufferedImage bi = null;
-	//comment
+	private final String tessdata = "C:\\Program Files\\Tesseract-OCR\\tessdata\\";
 	
 	public static void main(String[] args) {
 		
-		//String path = args[0];
-		String path = "D:\\Work\\Tess\\greek\\eurotext.tif";
+		String pdfFilePath = args[0];
+		File imageFile = ImageExtracter.getImageFromPDF(pdfFilePath);
 		FontTester tester = new FontTester();
-		BufferedImage bi = tester.getImage(path);
-		Set<String> fontSet = tester.getFontsFromImage(bi);
-		System.out.println("#########Image fonts############");
-		fontSet.forEach(c -> System.out.println(c));
-		System.out.println("##########System fonts###########");
-		Set<String> systemFonts = tester.getSystemFonts();
-		systemFonts.forEach(f -> System.out.printf("%s, ",f));
-		System.out.println();
-		List<String>missingFonts = tester.mimssingFonts(fontSet, systemFonts);
-		System.out.println("#######Missing fonts#################");
-		missingFonts.forEach(ft -> System.out.println(ft));
-		
+		BufferedImage bi = tester.getImage(imageFile.getAbsolutePath());
+		Set<String> imageFonts = tester.getFontsFromImage(bi);
+		Set<String> physicalFonts = tester.getSystemFonts();
+		compareFonts(imageFonts,physicalFonts);
+			
 	}
 	
-	private List<String>mimssingFonts(Set<String> imgFonts,Set<String>sysFonts){
+	public  static void compareFonts(Set<String> imageFonts,Set<String> physicalFonts) {
+		
+		System.out.println("#########Image fonts############");
+		imageFonts.forEach(c -> System.out.println(c));
+		
+		System.out.println("##########Physical fonts###########");
+		physicalFonts.forEach(f -> System.out.printf("%s, ",f));
+		System.out.println();
+		List<String>missingFonts = missingFonts(imageFonts,physicalFonts);
+		System.out.println("#######Missing fonts#################");
+		missingFonts.forEach(ft -> System.out.println(ft));
+	
+	}
+	
+	private static List<String>missingFonts(Set<String> imgFonts,Set<String>sysFonts){
 		/*
 		 * Return missing fonts.
 		 */
@@ -64,33 +71,18 @@ public class FontTester {
 		return list;
 	}
 	
-	public  void loadTesseract(String path) {
-				
-		BufferedImage bi = getImage(path);
-		tess = new Tesseract();
-		
-		//tess.setLanguage("deu");
-		/*try {
-			String result = tess.doOCR(bi);
-			
-			System.out.println(result);
-		} catch (TesseractException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
-	}
+	
 	
 	public Set<String> getFontsFromImage(BufferedImage bi)  {
 		/*
 		 * Prints the font information. using TessbaseAPI
 		 * */
 		//handle
-		String tessdata = "C:\\Program Files\\Tesseract-OCR\\tessdata\\";
+		
 		int bpp = bi.getColorModel().getPixelSize();
         int bytespp = bpp / 8;
         int bytespl = (int) Math.ceil(bi.getWidth() * bpp / 8.0);
-        
+        System.out.println(bpp+"   "+bytespp+"  "+bytespl);
 		TessBaseAPI api = null;
 		api = TessAPI1.TessBaseAPICreate();
 		
@@ -99,7 +91,7 @@ public class FontTester {
 		TessAPI1.TessBaseAPISetPageSegMode(api, TessPageSegMode.PSM_AUTO);
 		TessAPI1.TessBaseAPISetImage(api, buff,bi.getWidth(),bi.getHeight(),bytespp,bytespl);
 		TessAPI1.TessBaseAPIRecognize(api, null);
-		
+				
 		TessResultIterator tri = TessAPI1.TessBaseAPIGetIterator(api);
 		TessPageIterator tpi = TessAPI1.TessResultIteratorGetPageIterator(tri);
 	
@@ -157,8 +149,7 @@ public class FontTester {
 	 */
 		String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 		Set<String> fontSet = new HashSet<>(Arrays.asList(fonts));
-		return fontSet;
-		
+		return fontSet;		
 	}
 		
 
