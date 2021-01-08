@@ -30,7 +30,12 @@ public class FontTester {
 	
 	private Tesseract tess = null;
 	private BufferedImage bi = null;
+	
+	//Default tessdata path. Should contain legacy engine(eng.traineddata)
 	private final String tessdata = "C:\\Program Files\\Tesseract-OCR\\tessdata\\";
+	
+	//Temp folder where image will be extracted from PDF
+	public static final String tempPath = "D:\\Work\\Tess\\";
 	
 	public static void main(String[] args) {
 		

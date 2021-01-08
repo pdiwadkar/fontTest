@@ -33,7 +33,7 @@ public class ImageExtracter {
 			 bi = render.renderImage(0);
 			String diskPath = getFileName(rand);
 			System.out.println(diskPath);
-			pngFile = new File("D:\\Work\\Tess\\"+diskPath);
+			pngFile = new File(FontTester.tempPath+diskPath);
 			System.out.println(pngFile.createNewFile());
 			String tPath = pngFile.getAbsolutePath();
 			 //ImageIO.wri
